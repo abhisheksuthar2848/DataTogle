@@ -1,0 +1,339 @@
+﻿@*@{Layout = null; }*@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>
+
+    <button type="button" id="btnAdd" class="btn btn-info btn-lg" data-target="#myModal"> Add</button>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            Modal content
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="name1" class="control-label col-sm-2">Name</label>
+                                <input type="text" class="form-control " placeholder="Enter Name " id="name1" value="" />
+                                <input type="hidden" class="form-control " id="id1" value="" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="address1" class="control-label col-sm-2">Address</label>
+                                <input type="text" class="form-control " placeholder="Enter Address " id="address1" value="" />
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="dob1" class="control-label col-sm-2 ">Dob</label>
+                                <input type="text" class="form-control  " id="dob1" value="" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="image1" class="control-label col-sm-2 ">Image</label>
+                                <input type="file" class="form-control  " id="image1" value="" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+
+                                <label for="contect1" class="control-label col-sm-2 ">Contect</label>
+                                <input type="text" class="form-control  " placeholder="Enter Contect " id="contect1" value="" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="state1" class="control-label col-sm-2 ">State</label>
+                                <select class="form-control" id="state1">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="city1" class="control-label col-sm-2 ">City</label>
+                                <select class="form-control" id="city1">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-inline  ">
+                                <button type="button" id="btnInsert" class="btn btn-success col-sm-1" data-dismiss="modal">Insert</button>
+                                <button type="button" id="btnUpdate" class="btn btn-success col-sm-1" data-dismiss="modal">Update</button>
+                                <button type="button" class="btn btn-danger col-sm-1" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <table id="demodata" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Dob</th>
+                <th>Image</th>
+                <th>Contect</th>
+                <th>State</th>
+                <th>City</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script type="text/javascript">
+        var stateData = [], cityData = [];
+        $(document).ready(function () {
+            EmployeeDatatable();
+            GetStateList();
+            GetCityList();
+
+
+
+        });
+        $(document).on('click', '#btnAdd', function () {
+            $('#myModal').modal('show');
+
+        });
+        function EmployeeDatatable() {
+            $("#demodata").DataTable({
+
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                "destroy": true,
+                "ordering": true,
+                "ajax": {
+                    "url": '/Home/DisplayListData',
+                    "type": "POST",
+                    "datatype": "json"
+                },
+
+                "columns": [
+                    { "data": "Name", "name": "Name", "autoWidth": true }
+                    , { "data": "Address", "Name": "Address", "autoWidth": true }
+                    , {
+                        "data": "Dob", "render": function (data, type, row) {
+
+                            return moment(row.data).format('MM/DD/YYYY')
+                        }
+                    }
+
+
+                    , {
+                        "data": "Image", "searchable": false,
+                        "sortable": false,
+                        "render": function (data, type, row) {
+                            // debugger
+                            return '   <img src="/Uploads/' + row.Image + '" alt="imge not found"  height="100px" width="100px "/>';
+                        }
+                    }
+                    , { "data": "Contect", "name": "Contect", "autoWidth": true }
+                    , { "data": "Statename", "name": "Statename", "autoWidth": true }
+                    , { "data": "CityName", "name": "CityName", "autoWidth": true, "searchable": true}
+                    , {
+                        "data": "notes",
+                        "searchable": false,
+                        "sortable": false,
+                        "render": function (data, type, row) {
+                            // debugger
+                            return '<td><a onclick="GetById(' + row.Id + ')"><i class="icons">edit</i></a></td><td><a onclick=""></a></td><td><a onclick="Delele(' + row.Id + ')"><i class="material-icons">delete</i></a></td>';
+                        }
+
+                    }
+
+
+                ]
+            });
+        }
+
+        function GetStateList() {
+            $.ajax({
+                url: '/Home/GetStateList',
+                type: 'get',
+                success: function (data) {
+                    //debugger
+                    if (data.isSuccess = true) {
+                        stateData = data.stateData;
+                        $('#state1').html(stateData.map(x => `<option value="${x.Stateid}">${x.Statename}</option>`).join(''));
+                    }
+                    else {
+                        alert(data.message);
+                    }
+
+                },
+                error: function (err) {
+                    alert(err);
+                }
+
+
+            });
+        }
+
+        function GetCityList() {
+            $.ajax({
+                url: '/Home/GetCityList',
+                type: 'get',
+                success: function (data) {
+                    //debugger
+                    if (data.isSuccess = true) {
+                        cityData = data.cityData;
+                    }
+                    else {
+                        alert(data.massage)
+                    }
+
+
+                },
+                error: function (err) {
+                    alert(err);
+                }
+            });
+        }
+
+        $(document).on('change', '#state1', function () {
+            // debugger
+            var cityList = cityData.filter(x => x.StateId == $(this).val());
+            $('#city1').html(cityList.map(x => `<option value="${x.CityId}">${x.CityName}</option>`).join(''));
+
+
+        });
+
+        $(document).on('click', '#btnInsert', function () {
+            debugger
+            if (window.FormData !== undefined) {
+                var fileUpload = $('#image1').get(0);
+                var files = fileUpload.files;
+
+
+                var formdata = new FormData();
+
+                for (var i = 0; i < files.length; i++) {
+
+                    formdata.append(files[i].name, files[i]);
+                }
+
+                formdata.append("Id", $('#id1').val());
+                formdata.append("Name", $('#name1').val());
+                formdata.append("Address", $('#address1').val());
+                formdata.append("Dob", $('#dob1').val());
+                formdata.append("Image", $('#image1').val());
+                formdata.append("Contect", $('#contect1').val());
+                formdata.append("StateId", $('#state1').val());
+                formdata.append("CityId", $('#city1').val());
+
+                $.ajax({
+                    url: '/Home/insert',
+                    type: 'post',
+                    contentType: false,
+                    processData: false,
+                    data: formdata,
+                    success: function (data) {
+                        alert(data);
+                        $('#myModal').modal('hide');
+                        Cleardata()
+
+                    },
+                    error: function (err) {
+                        alert(err);
+                    }
+                });
+
+            }
+            else {
+                alert("FormData is not suppoert in the browser ")
+            }
+
+
+
+        });
+
+
+
+        function Cleardata() {
+
+            $('#id1').val('');
+            $('#name1').val('');
+            $('#address1').val('');
+            $('#dob1').val('');
+            $('#image1').val('');
+            $('#contect').val('');
+            $('#state1').val('');
+            $('#city1').val('');
+        }
+
+        function GetById(id) {
+            debugger
+            $.ajax({
+
+                url: '/home/GetById/' + id,
+                type: 'get',
+                dataType: 'json',
+                success: function (data) {
+                    $('#id1').val(data.Id);
+                    $('#name1').val(data.Name);
+                    $('#address1').val(data.Address);
+                    $('#dob1').val(data.Dob);
+                    $('#image1').val(data.Image);
+                    $('#contect').val(data.Contect);
+                    $('#state1').val(data.StateId);
+                    $('#city1').val(data.CityId);
+                },
+                error: function (err) {
+
+                    alert(err)
+                }
+
+
+            });
+
+        }
+
+        function Delele(ID) {
+            debugger
+            var ans = confirm("Are you sure you want to delete this Record?");
+            if (ans) {
+                $.ajax({
+                    url: "/Home/Delete?ID=" + ID,
+                    type: "post",
+                    dataType: "json",
+                    success: function (result) {
+                        EmployeeDatatable();
+
+                    },
+                    error: function (err) {
+                        alert(err.responseText);
+                    }
+                });
+            }
+        }
+    </script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+</body>
+</html>
